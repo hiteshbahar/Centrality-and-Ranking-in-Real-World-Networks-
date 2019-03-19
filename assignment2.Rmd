@@ -1,0 +1,258 @@
+---
+title: "CptS 591: Elements of Network Science - Assignment 2"
+author: "Hitesh Bahar"
+date: "3/1/2019"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+
+
+```{r}
+library(igraph)
+library(ggplot2)
+require(scales)
+library(knitr)
+
+setwd("D:/NetworkScience/assignment2")
+```
+
+
+## Problem-1
+
+The fourth real world network I have chosen here is *Astrophysics collaborations*, which contains the collaboration network of scientists posting preprints on the astrophysics archive at www.arxiv.org, 1995-1999,
+as compiled by M. Newman. It is a weighted network. 
+
+The URL for the data is http://www-personal.umich.edu/~mejn/netdata/astro-ph.zip
+
+In this questoin we will find the node importance using centrality measure of the following:
+
+1. Degree
+2. Eccentricity
+3. Closeness
+4. Betweenness
+5. Katz index
+6. PageRank
+7. Kleinberg's Authority score
+6. Kleinberg's Hub score
+
+
+```{r question1, results='asis',error=F,warning=F}
+politcalNetwork <- read_graph("polblogs.gml", format = "gml")
+internetNetwork <- read_graph("internet.gml",format = "gml")
+neuralNetwork <- read_graph("neuralnetwork.gml", format = "gml")
+astroPhysics <- read_graph("astro-ph.gml", format = "gml")
+
+dfGraph  <- data.frame(Network = character(0),  
+                 Degree = numeric(0),
+                 Eccentricity = numeric(0),
+                 Closeness = numeric(0),
+                 Betweenness = numeric(0),
+                 Katz_Index = numeric(0),
+                 PageRank = numeric(0),
+                 Kleinbergs_Authority_score = numeric(0),
+                 Kleinbergs_Hub_score = numeric(0),
+                 stringsAsFactors = FALSE)
+#Political netowk 
+maxDegree <- which.max(degree(politcalNetwork))
+maxEccentricity <- which.max(eccentricity(politcalNetwork))
+maxCloseness <- which.max(closeness(politcalNetwork))
+maxBetweeness <- which.max(betweenness(politcalNetwork))
+KatzIndex <- NA
+maxPageRank <- which.max(page_rank(politcalNetwork)$vector)
+maxKAuthScore <-  which.max(authority_score(politcalNetwork)$vector)
+maxKHubScore <- which.max(hub_score(politcalNetwork)$vector)
+
+dfGraph[nrow(dfGraph)+1,] <- c("Political Netowrk",maxDegree,maxEccentricity,
+                               maxCloseness,maxBetweeness,KatzIndex,maxPageRank,
+                               maxKAuthScore,maxKHubScore)
+
+
+#neuralNetwork
+maxDegree <- which.max(degree(neuralNetwork))
+maxEccentricity <- which.max(eccentricity(neuralNetwork))
+maxCloseness <- which.max(closeness(neuralNetwork))
+maxBetweeness <- which.max(betweenness(neuralNetwork))
+KatzIndex <- NA
+maxPageRank <- which.max(page_rank(neuralNetwork)$vector)
+maxKAuthScore <-  which.max(authority_score(neuralNetwork)$vector)
+maxKHubScore <- which.max(hub_score(neuralNetwork)$vector)
+
+dfGraph[nrow(dfGraph)+1,] <- c("neural Network",maxDegree,maxEccentricity,
+                               maxCloseness,maxBetweeness,KatzIndex,maxPageRank,
+                               maxKAuthScore,maxKHubScore)
+
+#Internet Network 
+maxDegree <- which.max(degree(internetNetwork))
+maxEccentricity <- which.max(eccentricity(internetNetwork))
+maxCloseness <- which.max(closeness(internetNetwork))
+maxBetweeness <- which.max(betweenness(internetNetwork))
+KatzIndex <- NA
+maxPageRank <- which.max(page_rank(internetNetwork)$vector)
+maxKAuthScore <-  which.max(authority_score(internetNetwork)$vector)
+maxKHubScore <- which.max(hub_score(internetNetwork)$vector)
+
+dfGraph[nrow(dfGraph)+1,] <- c("Internet Network",maxDegree,maxEccentricity,
+                               maxCloseness,maxBetweeness,KatzIndex,maxPageRank,
+                               maxKAuthScore,maxKHubScore)
+
+#astroPhysics
+maxDegree <- which.max(degree(astroPhysics))
+maxEccentricity <- which.max(eccentricity(astroPhysics))
+maxCloseness <- which.max(closeness(astroPhysics))
+maxBetweeness <- which.max(betweenness(astroPhysics))
+KatzIndex <- NA
+maxPageRank <- which.max(page_rank(astroPhysics)$vector)
+maxKAuthScore <-  which.max(authority_score(astroPhysics)$vector)
+maxKHubScore <- which.max(hub_score(astroPhysics)$vector)
+
+dfGraph[nrow(dfGraph)+1,] <- c("Astro Physics",maxDegree,maxEccentricity,
+                               maxCloseness,maxBetweeness,KatzIndex,maxPageRank,
+                               maxKAuthScore,maxKHubScore)
+
+kable(dfGraph, format = "markdown")
+```
+
+**Observation: **
+
+1. *Political Network:*  In this network, nodes 855 and 155 are important an node 855 has maximum degree as well as betweenness and node 155 has highest page rank and Kleinberg's authority score
+
+2. *Internet Network:* In this network, node 4 is important as it has highest degree, betweenness, pagerank, Kleinberg's authority score and Kleinberg's hub score
+
+3. *Neural Network:* Here node 45 is an important node as it has highest degree,pagerank and Kleinberg's authority score
+
+4. *AstroPhysics Network:* Here node 55-3 is important as it has the highesst degree, closeness, Kleinberg's authority score and Kleinberg's hub score
+
+
+## problem-2(2.1, 2.2)
+```{r}
+er20 <- erdos.renyi.game(20,80,type ="gnm")
+er40 <- erdos.renyi.game(40,120,type="gnm")
+bb20 <- barabasi.game(n=20, m=5, directed=FALSE)
+bb40 <- barabasi.game(n= 40, m= 3, directed = FALSE)
+
+df <- data.frame(Graph = character(0),  
+                 n = numeric(0),
+                 m = numeric(0),
+                 d_min = numeric(0),
+                 d_max = numeric(0),
+                 l = numeric(0),
+                 D = numeric(0),
+                 ccg = numeric(0),
+                 lambda_2 = numeric(0),
+                 lambda_N = numeric(0),
+                 stringsAsFactors = FALSE)
+
+df[nrow(df)+1,] <- c("Erdos-Renyi 20",
+                     vcount(er20),
+                     ecount(er20),
+                     min(degree(er20)),
+                     max(degree(er20)),
+                     mean_distance(er20),
+                     diameter(er20),
+                     transitivity(er20, type= "globalundirected"),
+                     sort(eigen(laplacian_matrix(er20))$values,decreasing = FALSE)[2],
+                     sort(eigen(laplacian_matrix(er20))$values,decreasing = TRUE)[1])
+
+df[nrow(df)+1,] <- c("Erdos-Renyi 40",
+                     vcount(er40),
+                     ecount(er40),
+                     min(degree(er40)),
+                     max(degree(er40)),
+                     mean_distance(er40),
+                     diameter(er40),
+                     transitivity(er40, type= "globalundirected"),
+                     sort(eigen(laplacian_matrix(er40))$values,decreasing = FALSE)[2],
+                     sort(eigen(laplacian_matrix(er40))$values,decreasing = TRUE)[1])
+
+df[nrow(df)+1,] <- c("Barabasi 20",
+                     vcount(bb20),
+                     ecount(bb20),
+                     min(degree(bb20)),
+                     max(degree(bb20)),
+                     mean_distance(bb20),
+                     diameter(bb20),
+                     transitivity(bb20, type= "globalundirected"),
+                     sort(eigen(laplacian_matrix(bb20))$values,decreasing = FALSE)[2],
+                     sort(eigen(laplacian_matrix(bb20))$values,decreasing = TRUE)[1])
+
+df[nrow(df)+1,] <- c("Barabasi 40",
+                     vcount(bb40),
+                     ecount(bb40),
+                     min(degree(bb40)),
+                     max(degree(bb40)),
+                     mean_distance(bb40),
+                     diameter(bb40),
+                     transitivity(bb40, type= "globalundirected"),
+                     sort(eigen(laplacian_matrix(bb40))$values,decreasing = FALSE)[2],
+                     sort(eigen(laplacian_matrix(bb40))$values,decreasing = TRUE)[1])
+
+kable(df, format = "markdown")
+```
+
+**Observation: **
+
+* It can be observed above that the number of edges for both Barabasi and Erdos_Renyi Graphs are almost same.
+
+* Highest Maximum and minimum degrees(17 and 5 respectively) are seen in Barabasi Graph 20, which means that there are more edges from a vertex in Barabasi graph when compared with Erdos-Renyi.
+
+* In Both the graphs the average path lengths are almost equal. Here, for Erods-Renyi 20 and Barabasi 20, the average number of steps along the shortest path is ~1.5, while for Erods-Renyi 40 and Barabasi 40, the average number of steps along the shortest path is ~2.2
+
+* From the Global Clustering Coefficent(ccg), Erdos Renyi 40, has the lowest vale, which means there are less nodes in the graph which cluster together.
+
+* From the second smallest eigen value, Barabasi 40 has the less algebraic connectivity in the graph when compared with other graphs.
+
+* From the largest eigen value, Barabasi 20 has the maximum spectral radius in the graph when compared with other graphs.
+
+## Question-2(2.3)
+Plotting the eigenvector corresponding to the second-smallest eigenvalue (??2) and the eigenvector corresponding to the largest eigenvalue (??n)
+```{r}
+
+x_axis <- c(1:20)
+lambda2 <- eigen(graph.laplacian(er20))[["vectors"]][,19]
+lambdaN <- eigen(graph.laplacian(er20))[["vectors"]][,which.max(eigen(graph.laplacian(er20))$values)]
+
+plotdfER <- data.frame(x_axis, lambda2, lambdaN)
+
+ggplot(plotdfER, aes(x = plotdfER$x_axis)) + 
+  geom_line(aes(y = plotdfER$lambda2), colour="red", size = 1.2, linetype="dashed") + 
+  geom_line(aes(y = plotdfER$lambdaN), colour = "blue", size = 1) + 
+  scale_colour_manual("",breaks = c("lambda2", "lambdaN"),values = c("red", "blue")) +
+  ylab(label="eigen vector") + 
+  xlab("vertex ID") +
+  labs(title = "Vextex Id VS Eigen Vector - Erdos Renyi Graph") 
+
+lambda2 <- eigen(graph.laplacian(bb20))[["vectors"]][,19]
+lambdaN <- eigen(graph.laplacian(bb20))[["vectors"]][,which.max(eigen(graph.laplacian(er20))$values)]
+
+plotdfBB <- data.frame(x_axis, lambda2, lambdaN)
+
+ggplot(plotdfBB, aes(x = x_axis)) + 
+  geom_line(aes(y = lambda2), colour="red", size = 1.2, linetype="dashed") + 
+  geom_line(aes(y = lambdaN), colour = "blue", size = 1) + 
+  scale_colour_manual("",breaks = c("lambda 2", "lambda N"),values = c("red", "blue")) +
+  ylab(label="eigen vector") + 
+  xlab("vertex ID") +
+  labs(title = "Vextex Id VS Eigen Vector - Barabasi Graph") 
+
+```
+
+
+**Observation:**
+
+It can be observed that both the Barabasi and Erdos Renyi Graphs are irregular by nature. However, The eigen values of both the second lowest lambda( lambda2 ) and highest lambda( lambda N) of Barabasi graph are found close to zero. It can be seen that there is a deviation of eigen values in the eigen vectors for both the graphs.
+
+## Problem-3
+
+**Page Rank Beyond the Web** artcile reviews the Google's Page Rank Algorithm. It is very intresting to see various applications of a computer science algorithm. Below are the applications which I found intresting.
+1. Page Rank in NeuroScience
+2. PageRank of the LinuxKernel
+3. PageRank in Social Networks
+
+1. *PageRank in NeuroScience:* I was amazed to see how pagerank evaluated the importance of brain regions for the given obersvations in brain activity. When an algorithm is combined with other algorithms it becomes very resourcefull and solves most of the problems, just like page rank combined with community detection and known brain regions to understand the brain structure. Lastly how pge rank was used by Croft and Higgsman to solve hirarcial structure and how the nodes minized the discripancy in hierarchial hypothesis.
+
+2. *PageRank in LinuxKernel:* Another application I found intresting was application of pagerank in complex Engineered Systems especially on Linux Kernels. Especially how the kernel grpah represeneted the dependencies and calling the pagerank, centrality score which is vital in ordering the important functions in Kernel.How the uitlity functions like printk having highest pageRank and start_kernel has the highest reverse_PageRank.
+
+3. *PageRank in Social Networks:* It is always fasinating to see how social networks like facebook Twitter suggest friends who are common to my friends so that we can also be friends.  Also by looking the centrality, how this solved the social status and power of the person.Lastly how page rank solves the potential influence of an node which shows how the process of influencing works on a social network.
